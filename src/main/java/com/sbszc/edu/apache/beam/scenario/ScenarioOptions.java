@@ -16,11 +16,13 @@ public interface ScenarioOptions extends PipelineOptions {
     interface Scenarios {
         String ParDoExample = "ParDoExample";
         String TransactionsExample = "TransactionsExample";
+        String DataflowExample = "DataflowExample";
 
         static String listScenarios() {
             return List.of(
                             ParDoExample,
-                            TransactionsExample)
+                            TransactionsExample,
+                            DataflowExample)
                     .toString();
         }
     }
