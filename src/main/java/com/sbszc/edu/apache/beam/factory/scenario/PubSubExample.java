@@ -1,7 +1,7 @@
-package com.sbszc.edu.apache.beam.scenario;
+package com.sbszc.edu.apache.beam.factory.scenario;
 
-import com.google.cloud.spanner.Mutation;
-import com.sbszc.edu.apache.beam.util.LogPTransform;
+import com.sbszc.edu.apache.beam.factory.ScenarioOptions;
+import com.sbszc.edu.apache.beam.util.LoggingTransform;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.io.gcp.pubsub.PubsubIO;
 import org.apache.beam.sdk.options.Description;
@@ -11,7 +11,7 @@ public interface PubSubExample {
 
     static void accept(Pipeline pipeline, Options options) {
         pipeline.apply("Read from subscription", PubsubIO.readStrings().fromSubscription(options.getSubscription()))
-                .apply(new LogPTransform<>());
+                .apply(new LoggingTransform<>());
     }
 
     interface Options extends ScenarioOptions {

@@ -1,8 +1,9 @@
-package com.sbszc.edu.apache.beam.scenario;
+package com.sbszc.edu.apache.beam.factory.scenario;
 
+import com.sbszc.edu.apache.beam.factory.ScenarioOptions;
+import com.sbszc.edu.apache.beam.model.ProdTypePrice;
 import com.sbszc.edu.apache.beam.model.Transaction;
-import com.sbszc.edu.apache.beam.util.LogPTransform;
-import lombok.Data;
+import com.sbszc.edu.apache.beam.util.LoggingTransform;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.options.Description;
@@ -10,13 +11,13 @@ import org.apache.beam.sdk.options.Validation;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.ParDo;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 
 public interface TransactionsExample {
+
     static void accept(Pipeline pipeline, Options options) {
         pipeline.apply("Read strings from input file", TextIO.read().from(options.getInputFile()))
-                .apply(new LogPTransform<>())
+                .apply(new LoggingTransform<>())
                 .apply("Map string to Transaction", ParDo.of(new DoFn<String, Transaction>() {
                     @ProcessElement
                     public void processElement(@Element String str, OutputReceiver<Transaction> out) {
@@ -28,27 +29,25 @@ public interface TransactionsExample {
                         out.output(new Transaction(id, customerType, productType, price));
                     }
                 }))
-                .apply(new LogPTransform<>())
+                .apply(new LoggingTransform<>())
                 .apply("Map Transaction to ProdTypePrice", ParDo.of(new DoFn<Transaction, ProdTypePrice>() {
                     @ProcessElement
                     public void processElement(@Element Transaction transaction, OutputReceiver<ProdTypePrice> out) {
                         out.output(new ProdTypePrice(transaction.getProductType(), transaction.getPrice()));
                     }
                 }))
-                .apply(new LogPTransform<>())
+                .apply(new LoggingTransform<>())
                 .apply("Map ProdTypePrice to string", ParDo.of(new DoFn<ProdTypePrice, String>() {
                     @ProcessElement
                     public void processElement(@Element ProdTypePrice prodTypePrice, OutputReceiver<String> out) {
-                        out.output(String.format("%s,%s", prodTypePrice.productType, prodTypePrice.price));
+                        out.output(String.format("%s,%s", prodTypePrice.getProductType(), prodTypePrice.getPrice()));
                     }
                 }))
-                .apply(new LogPTransform<>())
+                .apply(new LoggingTransform<>())
                 .apply("Write strings to output file", TextIO.write()
                         .withoutSharding()
                         .to(options.getOutputFile())
-                        .withSuffix(options.getOutputFileSuffix()))
-        ;
-
+                        .withSuffix(options.getOutputFileSuffix()));
     }
 
     interface Options extends ScenarioOptions {
@@ -69,11 +68,5 @@ public interface TransactionsExample {
         String getOutputFileSuffix();
 
         void setOutputFileSuffix(String outputFileSuffix);
-    }
-
-    @Data
-    class ProdTypePrice implements Serializable {
-        private final String productType;
-        private final BigDecimal price;
     }
 }

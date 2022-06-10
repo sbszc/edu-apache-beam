@@ -7,7 +7,7 @@ import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
 
 @Slf4j
-public class LogPTransform<T> extends PTransform<PCollection<T>, PCollection<T>> {
+public class LoggingTransform<T> extends PTransform<PCollection<T>, PCollection<T>> {
     @Override
     public PCollection<T> expand(PCollection<T> input) {
         return input.apply(ParDo.of(new DoFn<T, T>() {
