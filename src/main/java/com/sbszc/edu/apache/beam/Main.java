@@ -1,11 +1,8 @@
 package com.sbszc.edu.apache.beam;
 
 import com.sbszc.edu.apache.beam.exception.UnsupportedScenarioException;
-import com.sbszc.edu.apache.beam.scenario.DataflowExample;
-import com.sbszc.edu.apache.beam.scenario.ParDoExample;
-import com.sbszc.edu.apache.beam.scenario.ScenarioOptions;
+import com.sbszc.edu.apache.beam.scenario.*;
 import com.sbszc.edu.apache.beam.scenario.ScenarioOptions.Scenarios;
-import com.sbszc.edu.apache.beam.scenario.TransactionsExample;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 
@@ -14,6 +11,7 @@ public class Main {
         PipelineOptionsFactory.register(ScenarioOptions.class);
         PipelineOptionsFactory.register(TransactionsExample.Options.class);
         PipelineOptionsFactory.register(DataflowExample.Options.class);
+        PipelineOptionsFactory.register(PubSubExample.Options.class);
 
         ScenarioOptions scenarioOptions = PipelineOptionsFactory
                 .fromArgs(args)
@@ -47,6 +45,16 @@ public class Main {
                 pipeline = Pipeline.create(dataflowExampleOptions);
 
                 DataflowExample.accept(pipeline, dataflowExampleOptions);
+                break;
+            case Scenarios.PubSubExample:
+                PubSubExample.Options pubSubExampleOptions = PipelineOptionsFactory
+                        .fromArgs(args)
+                        .withValidation()
+                        .as(PubSubExample.Options.class);
+
+                pipeline = Pipeline.create(pubSubExampleOptions);
+
+                PubSubExample.accept(pipeline, pubSubExampleOptions);
                 break;
             default:
                 throw new UnsupportedScenarioException(
